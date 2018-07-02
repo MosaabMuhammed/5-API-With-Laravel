@@ -18,7 +18,7 @@
   - AngularJs (AJAX - Form Validation)
   - SQLite
 - **Try the App:**
-  -   Make sure to write this command in your terminal to make it work effectively
+  -   Make sure to write this command in your terminal that is placed in your working directory to make it work effectively
     ```php
     >> php artisan serve
     ```
