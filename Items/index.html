@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Items</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.css" media="screen">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.min.js"></script>
+    <style>
+    	input.ng-invalid.ng-touched {
+    		border: 1px solid #da3637;
+    	}
+    	input.ng-valid.ng-touched {
+    		border: 1px solid #509d12;
+    	}
+    	.ng-invalid .btn {
+    		background: gray;
+    	}
+    </style>
+</head>
+<body ng-app="app" ng-controller="ItemsController" ng-init="getItems()">
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+			<div class="container">
+				<a class="navbar-brand" href="#">Items Manager</a>
+				<div class="collapse navbar-collapse" id="navbarColor02">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item active">
+							<a class="nav-link" href="/">Home</a>
+						</li>
+					</ul>
+					<form class="form-inline my-2 my-lg-0">
+						<input class="form-control mr-sm-2" type="text" placeholder="Search">
+						<button class="btn btn-secondary my-2 my-sm-0" type="submit" >Search</button>
+					</form>
+				</div>
+			</div>
+		</nav>
+
+		<div class="container">
+			<br>
+			<h1 class="text-center">Add Items:</h1>
+			<form ng-submit="SubmitOrUpdate(id)" name="ItemForm" novalidate>
+				<div class="form-group">
+					<label for="title">Title:</label>
+					<input type="text" ng-model="text" name="text" class="form-control" value="{{ item.text }}" ng-required="true">
+					<p ng-show="ItemForm.text.$invalid && ItemForm.text.$touched" class="alert alert-danger" id="danger">
+						You Must Fill Out The Item Name!
+					</p>
+				</div>
+				<div class="form-group">
+					<label for="body">Body:</label>
+					<textarea name="body" cols="30" rows="10" class="form-control" ng-model="body" value="{{ item.body }}" ng-required="true"></textarea>
+					<p ng-show="ItemForm.body.$invalid && ItemForm.body.$touched" class="alert alert-danger" id="danger">
+						You Must Fill Out The Item Body!
+					</p>
+
+				</div>
+				<button class="btn btn-info" id="toggBtn">Submit</button>
+				<button class="btn btn-outline-danger" ng-click="cancel()" style="display: none" id="cancel">Cancel</button>
+			</form>
+			<br>
+			<div>
+				<h1 class="text-center">Your Items</h1>
+				<ul class="list-group">
+					<li class="list-group-item" ng-repeat="item in items" style="position: relative;">
+						<strong style="color: #3dbc8c">Title:</strong> {{ item.text }}
+						<br>
+						<strong style="color: #3dbc8c">Body:</strong> {{ item.body }}
+						<button class="btn btn-outline-danger btn-sm" style="position: absolute; right: 12px; bottom: 23px;" ng-click="deleteItem(item.id)">Delete</button>
+						<button class="btn btn-outline-success btn-sm" style="position: absolute; right: 76px; bottom: 23px" ng-click="getItemById(item.id)">Edit</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<script>
+			var app = angular.module('app', []);
+
+			app.controller('ItemsController', function($scope, $http){
+				$scope.id = 0;
+
+				//////////// Get Items ///////////
+				$scope.getItems = function()
+				{
+					$http.get('http://127.0.0.1:8000/api/items')
+					.then(function(response){
+						$scope.items = response.data;
+					});
+				}
+				//////////// Get Item By Id///////////
+				$scope.getItemById = function(id)
+				{
+					btn = document.getElementById('toggBtn');
+					btn.classList.remove('btn-info');
+					btn.classList.add('btn-warning');
+					btn.innerHTML = "Update";
+					document.getElementById('cancel').style.display = "inline-block";
+
+					$http.get('http://127.0.0.1:8000/api/items/' + id)
+					.then(function(response){
+						$scope.text = response.data.text;
+						$scope.body = response.data.body;
+						$scope.id 	= response.data.id;
+					});
+				}
+				//////////// Insert Item ///////////
+				$scope.insertItem = function()
+				{
+					$http.post(
+						'http://127.0.0.1:8000/api/items',
+						{
+							text: $scope.text,
+							body: $scope.body
+						})
+					.then(function(response){
+						$scope.getItems();
+					});
+				}
+
+				//////////// delete Item ///////////
+				$scope.deleteItem = function(id)
+				{
+					console.log(id);
+					$http.post(
+						'http://127.0.0.1:8000/api/items/' + id,
+						{
+							'_method': 'DELETE'
+						})
+						.then(function(response){
+						$scope.getItems();
+					})
+				}
+
+				//////////// Update Item ///////////
+				$scope.updateItem = function(id)
+				{
+					$http.post(
+						'http://127.0.0.1:8000/api/items/' + id,
+						{
+							text: 		$scope.text,
+							body: 		$scope.body,
+							'_method': 	'PUT'
+						})
+					.then(function(response){
+						$scope.getItems();
+					});
+				}
+
+				//////////// Submit or Update ///////////
+				$scope.SubmitOrUpdate = function(id)
+				{
+					console.log(id);
+					btn = document.getElementById('toggBtn');
+					if(btn.innerHTML == 'Submit'){
+						$scope.insertItem();
+					} else {
+						$scope.updateItem(id);
+					}
+					$scope.cancel();
+
+				}
+				//////////// cancel  ///////////
+				$scope.cancel = function()
+				{
+					$scope.text = '';
+					$scope.body = '';
+					btn = document.getElementById('toggBtn');
+					btn.innerHTML = "Submit";
+					btn.classList.remove('btn-warning');
+					btn.classList.add('btn-info');
+					document.getElementById('cancel').style.display = "none";
+				}
+		});
+		</script>
+	</div>
+</body>
+</html>
