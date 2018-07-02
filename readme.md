@@ -22,6 +22,7 @@
     ```php
     >> php artisan serve
     ```
+  - Then go to  (*Items/index.html*) and open the file.
   - Now you're ready to go :wink:
 ## License
 
