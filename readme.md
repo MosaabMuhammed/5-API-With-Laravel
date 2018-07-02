@@ -10,7 +10,7 @@
   - You can create, update, and delete every item.
 - **Details:**
   - From the front-end's point of view, you have a template - *well-designed by Bootstrap* - that you can create, update, and delete any item you want by using a From -*well-Validated by AngularJs*-.
-  - From the back-end's point of view, you have an efficient API that can operate all the previous functions - *heart-made by Laravel-.
+  - From the back-end's point of view, you have an efficient API that can operate all the previous functions - *heart-made by Laravel*-.
   - The middle man between them was Angular, who was responsible to get the data from Laravel and put it nicely into the template.
 - **Tech Included:**
   - Laravel
